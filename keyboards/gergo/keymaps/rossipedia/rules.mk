@@ -14,6 +14,8 @@ DEBUG_MATRIX_SCAN_RATE   = no
 DEBUG_BALLER 		 = no
 DEBUG_MATRIX		 = yes
 
+TAP_DANCE_ENABLE = yes
+
 # A bunch of stuff that you shouldn't touch unless you
 # know what you're doing.
 #
