@@ -34,6 +34,7 @@ enum preonic_keycodes {
 #define CTL_ESC CTL_T(KC_ESC)
 #define RS_ENTR RSFT_T(KC_ENT)
 #define OSM_GA OSM(MOD_LGUI | MOD_LALT)
+#define LWR_SFT LM(_LOWER, MOD_LSFT)
 
 enum {
     TD_OPT_SPACE = 0
@@ -57,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┼────────┤
      KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RS_ENTR, \
   //├────────┼────────┼────────┼────────┼─────────────────┼─────────────────┼────────┼────────┼────────┼────────┤
-     LOWER ,  KC_LCTL, KC_LALT, TD_OSPC,       LOWER ,           KC_SPC,     OSM_GA , _______, _______, RAISE    \
+     LWR_SFT, KC_LCTL, KC_LALT, TD_OSPC,       LOWER ,           KC_SPC,     OSM_GA , _______, _______, RAISE    \
   //└────────┴────────┴────────┴────────┴─────────────────┴─────────────────┴────────┴────────┴────────┴────────┘
 ),
 
