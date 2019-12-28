@@ -16,6 +16,7 @@
 
 #include QMK_KEYBOARD_H
 #include "muse.h"
+#include "rossipedia.h"
 
 enum preonic_layers {
   _BASE,
@@ -30,21 +31,6 @@ enum preonic_keycodes {
   RAISE,
   BACKLIT
 };
-
-#define CTL_ESC CTL_T(KC_ESC)
-#define RS_ENTR RSFT_T(KC_ENT)
-#define OSM_GA OSM(MOD_LGUI | MOD_LALT)
-#define LWR_SFT LM(_LOWER, MOD_LSFT)
-
-enum {
-    TD_OPT_SPACE = 0
-};
-
-qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_OPT_SPACE] = ACTION_TAP_DANCE_DOUBLE(KC_LGUI, LALT(KC_SPC))
-};
-
-#define TD_OSPC TD(TD_OPT_SPACE)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
@@ -138,50 +124,6 @@ uint8_t last_muse_note = 0;
 uint16_t muse_counter = 0;
 uint8_t muse_offset = 70;
 uint16_t muse_tempo = 50;
-
-void encoder_update_user(uint8_t index, bool clockwise) {
-  if (muse_mode) {
-    if (IS_LAYER_ON(_RAISE)) {
-      if (clockwise) {
-        muse_offset++;
-      } else {
-        muse_offset--;
-      }
-    } else {
-      if (clockwise) {
-        muse_tempo+=1;
-      } else {
-        muse_tempo-=1;
-      }
-    }
-  } else {
-    if (clockwise) {
-      register_code(KC_PGDN);
-      unregister_code(KC_PGDN);
-    } else {
-      register_code(KC_PGUP);
-      unregister_code(KC_PGUP);
-    }
-  }
-}
-
-void dip_switch_update_user(uint8_t index, bool active) {
-    switch (index) {
-        case 0:
-            if (active) {
-                layer_on(_ADJUST);
-            } else {
-                layer_off(_ADJUST);
-            }
-            break;
-        case 1:
-            if (active) {
-                muse_mode = true;
-            } else {
-                muse_mode = false;
-            }
-    }
-}
 
 
 void matrix_scan_user(void) {
