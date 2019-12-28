@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "rossipedia.h"
 
 extern keymap_config_t keymap_config;
 
@@ -14,23 +15,6 @@ enum custom_keycodes {
   ADJUST,
 };
 
-
-// Send ESC on tap, CTRL on hold
-#define CTL_ESC CTL_T(KC_ESC)
-#define RS_ENTR RSFT_T(KC_ENT)
-#define OSM_GA OSM(MOD_LGUI | MOD_LALT)
-
-// Jesus tap dancing christ
-enum {
-    TD_OPT_SPACE = 0
-};
-
-qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_OPT_SPACE] = ACTION_TAP_DANCE_DOUBLE(KC_LGUI, LALT(KC_SPC))
-};
-
-#define TD_OSPC TD(TD_OPT_SPACE)
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_BASE] = LAYOUT(
@@ -41,7 +25,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
      CTL_ESC, KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                               KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_LBRC,          KC_RBRC, KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RS_ENTR,
+     KC_LSFT, KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    _______,          _______, KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, RS_ENTR,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
                                     KC_LALT, TD_OSPC, LOWER,                     RAISE,   KC_SPC,  OSM_GA
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
@@ -51,11 +35,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //┌────────┬────────┬────────┬────────┬────────┬────────┐                          ┌────────┬────────┬────────┬────────┬────────┬────────┐
      KC_F12,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,                              KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     RGB_TOG, _______, KC_VOLU, _______, _______, _______,                            KC_INS,  KC_HOME, KC_UP,   KC_END,  KC_PGUP, _______,
+     _______, _______, KC_VOLU, _______, KC_PLUS, KC_INS,                             KC_DEL,  KC_HOME, KC_UP,   KC_END,  KC_PGUP, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┤                          ├────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, KC_BRIU, KC_VOLD, _______, _______, _______,                            KC_DEL,  KC_LEFT, KC_DOWN, KC_RGHT, KC_PGDN, _______,
+     _______, KC_BRIU, KC_VOLD, _______, KC_UNDS, KC_MINS,                            KC_EQL,  KC_LEFT, KC_DOWN, KC_RGHT, KC_PGDN, _______,
   //├────────┼────────┼────────┼────────┼────────┼────────┼────────┐        ┌────────┼────────┼────────┼────────┼────────┼────────┼────────┤
-     _______, KC_BRID, KC_MUTE, _______, _______, KC_MINS, KC_UNDS,          KC_PLUS, KC_EQL,  _______, _______, _______, _______, _______,
+     RGB_TOG, KC_BRID, KC_MUTE, _______, KC_LCBR, KC_LBRC, _______,          _______, KC_RBRC, KC_RCBR, KC_DEL,  _______, _______, _______,
   //└────────┴────────┴────────┴───┬────┴───┬────┴───┬────┴───┬────┘        └───┬────┴───┬────┴───┬────┴───┬────┴────────┴────────┴────────┘
                                     _______, _______, _______,                   _______, _______, _______
                                 // └────────┴────────┴────────┘                 └────────┴────────┴────────┘
