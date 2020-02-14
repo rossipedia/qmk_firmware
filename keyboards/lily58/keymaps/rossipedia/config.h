@@ -46,9 +46,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Mouse Keys
 // #define MK_3_SPEED
 #define MOUSEKEY_DELAY 50
-#define MOUSEKEY_INTERVAL 16
-#define MOUSEKEY_MAX_SPEED 7
-#define MOUSEKEY_TIME_TO_MAX 40
+#define MOUSEKEY_INTERVAL 32
+#define MOUSEKEY_MAX_SPEED 30
+#define MOUSEKEY_TIME_TO_MAX 128
+#define MOUSEKEY_WHEEL_MAX_SPEED 1
+#define MOUSEKEY_WHEEL_TIME_TO_MAX 255
 
 // Underglow
 /*
