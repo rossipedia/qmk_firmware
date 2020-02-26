@@ -76,12 +76,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
-    /* case QWERTY: */
-    /*   if (record->event.pressed) { */
-    /*     set_single_persistent_default_layer(_BASE); */
-    /*   } */
-    /*   return false; */
-    /*   break; */
     case LOWER:
       if (record->event.pressed) {
         layer_on(_LOWER);
@@ -121,5 +115,5 @@ void keyboard_preinit_user(void) {
 
 void keyboard_post_init_user(void) {
     // Initialize the keyboard backlighting. To white, and off
-    rgblight_sethsv_noeeprom(HSV_WHITE);
+    rgblight_sethsv_noeeprom(0, 0, 200);
 }
