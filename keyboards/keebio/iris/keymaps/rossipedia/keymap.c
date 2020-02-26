@@ -115,5 +115,5 @@ void keyboard_preinit_user(void) {
 
 void keyboard_post_init_user(void) {
     // Initialize the keyboard backlighting. To white, and off
-    rgblight_sethsv_noeeprom(0, 0, 200);
+    rgblight_sethsv_noeeprom(0, 0, 100);
 }
