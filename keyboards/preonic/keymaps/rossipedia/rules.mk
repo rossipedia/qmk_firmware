@@ -1,7 +1,11 @@
 SRC += muse.c
 
 # Trim the fat
-LTO_ENABLE = yes
+# LTO_ENABLE = yes
 TAP_DANCE_ENABLE = yes
 
 BOOTMAGIC_ENABLE = lite
+POINTING_DEVICE_ENABLE = no
+MOUSEKEY_ENABLE = no       # Mouse keys
+RGBLIGHT_ENABLE = no
+BACKLIGHT_ENABLE = no
