@@ -23,9 +23,11 @@ const char *read_layer_state(void) {
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Gaming");
     break;
   case L_RAISE:
+  case L_RAISE | L_GAMING:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Raise");
     break;
   case L_LOWER:
+  case L_LOWER | L_GAMING:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Lower");
     break;
   case L_ADJUST:
