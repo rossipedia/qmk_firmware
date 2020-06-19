@@ -109,11 +109,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void keyboard_preinit_user(void) {
+#ifdef RGBLIGHT_ENABLE
     rgblight_disable();
     rgblight_disable_noeeprom();
+#endif
 }
 
 void keyboard_post_init_user(void) {
+#ifdef RGBLIGHT_ENABLE
     // Initialize the keyboard backlighting. To white, and off
     rgblight_sethsv_noeeprom(0, 0, 100);
+#endif
 }
