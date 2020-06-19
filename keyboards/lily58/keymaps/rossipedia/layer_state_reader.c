@@ -1,26 +1,32 @@
+
 #include QMK_KEYBOARD_H
 #include <stdio.h>
 #include "lily58.h"
 
 // in the future, should use (1U<<_LAYER_NAME) instead, but needs to be moved to keymap,c
 #define L_BASE 0
-#define L_GAMING 2
-#define L_LOWER 4
-#define L_RAISE 8
-#define L_ADJUST 16
-#define L_ADJUST_TRI 28
+#define L_GAMING (1 << 1)
+#define L_LOWER (1 << 2)
+#define L_RAISE (1 << 3)
+#define L_ADJUST (1 << 4)
+#define L_ADJUST_TRI (L_ADJUST | L_RAISE | L_LOWER)
 
 char layer_state_str[24];
 
 const char *read_layer_state(void) {
-  switch (layer_state)
-  {
+  // Base layers
+  switch (layer_state) {
   case L_BASE:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Default");
-    break;
+    return layer_state_str;
   case L_GAMING:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Gaming");
-    break;
+    return layer_state_str;
+  }
+
+  // layer mods, check against shifted layers only
+  switch (layer_state & ~(L_BASE | L_GAMING))
+  {
   case L_RAISE:
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Raise");
     break;
