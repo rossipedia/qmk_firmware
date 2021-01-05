@@ -1,0 +1,1 @@
+#define RGB_MATRIX_STARTUP_VAL 0
