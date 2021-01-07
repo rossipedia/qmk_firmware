@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Jun Wako <wakojun@gmail.com>
+ Copyright 2020 Álvaro "Gondolindrim" Volpato <alvaro.volpato@usp.br>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,10 +15,14 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <hal.h>
+#include "evolv.h"
 
-#include "led.h"
-
-
-void led_set(uint8_t usb_led) {
+__attribute__((weak)) void encoder_update_user(uint8_t index, bool clockwise) {
+    if (index == 0) { /* First encoder */
+        if (clockwise) {
+            tap_code(KC_VOLU);
+        } else {
+            tap_code(KC_VOLD);
+        }
+    } 
 }
