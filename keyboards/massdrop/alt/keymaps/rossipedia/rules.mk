@@ -1,1 +1,1 @@
-
+CONSOLE_ENABLE = yes

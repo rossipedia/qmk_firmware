@@ -4,7 +4,8 @@
 enum alt_keycodes {
     MD_BOOT = SAFE_RANGE,               //Restart into bootloader after hold timeout
     KC_WIN,
-    KC_GAM
+    KC_GAM,
+    KC_DBG,
 };
 
 enum alt_layers {
@@ -41,7 +42,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [LAYER_FN] = LAYOUT_65_ansi_blocker(
         KC_GRV,  KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  _______, KC_INS,  \
         _______, _______, KC_WIN,  _______, _______, _______, _______, KC_HOME, KC_UP,   KC_END,  KC_PGUP, KC_PSCR, KC_SLCK, KC_PAUS, KC_MUTE,\
-        _______, _______, _______, _______, _______, KC_GAM,  _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_PGDN, _______,          _______, KC_VOLU, \
+        _______, _______, _______, KC_DBG,  _______, KC_GAM,  _______, KC_LEFT, KC_DOWN, KC_RGHT, KC_PGDN, _______,          _______, KC_VOLU, \
         _______, RGB_VAI, RGB_SAI, RGB_HUI, _______, MD_BOOT, _______, _______, _______, _______, _______, _______,          KC_PGUP, KC_VOLD, \
         _______, _______, _______,                            RGB_TOG,                            _______, _______, KC_HOME, KC_PGDN, KC_END  \
     )
@@ -81,7 +82,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
               layer_invert(LAYER_GAMING);
             }
             return false;
+        case KC_DBG:
+            if (record->event.pressed) {
+                TOGGLE_FLAG_AND_PRINT(debug_enable, "Debug mode");
+                TOGGLE_FLAG_AND_PRINT(debug_matrix, "Debug matrix");
+            }
+            return false;
         default:
             return true; //Process all other keycodes normally
+    }
+
+    if (debug_enable) {
+        if (debug_matrix) {
+            matrix_print();
+        }
     }
 }
