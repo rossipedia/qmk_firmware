@@ -57,6 +57,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
 };
 
+const uint8_t LAYER_HUE_SATS[][2] = {
+    [LAYER_BASE] = {RGB_MATRIX_STARTUP_HUE, RGB_MATRIX_STARTUP_SAT},
+    [LAYER_WINDOWS] = {16, 255}, // Orange
+    [LAYER_GAMING] = {0, 255}, // Red
+};
+
+layer_state_t layer_state_set_user(uint32_t state) {
+    uint32_t active_layer = biton32(state);
+    dprintf("Current layer: %d\n", active_layer);
+
+    if (active_layer < LAYER_FN) {
+        rgb_matrix_sethsv(
+            LAYER_HUE_SATS[active_layer][0],
+            LAYER_HUE_SATS[active_layer][1],
+            rgb_matrix_get_val()
+        );
+    }
+    return state;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
 
