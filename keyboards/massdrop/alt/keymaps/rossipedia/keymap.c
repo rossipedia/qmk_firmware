@@ -58,7 +58,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 const uint8_t LAYER_HUE_SATS[][2] = {
-    [LAYER_BASE] = {RGB_MATRIX_STARTUP_HUE, RGB_MATRIX_STARTUP_SAT},
+    [LAYER_BASE] = {32,207},
     [LAYER_WINDOWS] = {16, 255}, // Orange
     [LAYER_GAMING] = {0, 255}, // Red
 };
@@ -75,6 +75,12 @@ layer_state_t layer_state_set_user(uint32_t state) {
         );
     }
     return state;
+}
+
+void keyboard_post_init_user(void) {
+#if PLAT == WIN
+    layer_on(LAYER_WINDOWS);
+#endif
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
