@@ -4,7 +4,8 @@
 enum ctrl_keycodes {
     MD_BOOT = SAFE_RANGE,               //Restart into bootloader after hold timeout
     KC_WIN,
-    KC_GAM
+    KC_GAM,
+    KC_DBG
 };
 
 enum ctrl_layers {
@@ -61,6 +62,31 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     */
 };
 
+const uint8_t LAYER_HUE_SATS[][2] = {
+    [LAYER_BASE] = {32,207},
+    [LAYER_WINDOWS] = {16, 255}, // Orange
+    [LAYER_GAMING] = {0, 255}, // Red
+};
+
+layer_state_t layer_state_set_user(uint32_t state) {
+    uint32_t active_layer = biton32(state);
+    dprintf("Current layer: %d\n", active_layer);
+
+    if (active_layer < LAYER_FN) {
+        rgb_matrix_sethsv(
+            LAYER_HUE_SATS[active_layer][0],
+            LAYER_HUE_SATS[active_layer][1],
+            rgb_matrix_get_val()
+        );
+    }
+    return state;
+}
+
+void keyboard_post_init_user(void) {
+#if PLAT == WIN
+    layer_on(LAYER_WINDOWS);
+#endif
+}
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
@@ -87,7 +113,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
               layer_invert(LAYER_GAMING);
             }
             return false;
+        case KC_DBG:
+            if (record->event.pressed) {
+                TOGGLE_FLAG_AND_PRINT(debug_enable, "Debug mode");
+                TOGGLE_FLAG_AND_PRINT(debug_matrix, "Debug matrix");
+            }
+            return false;
         default:
             return true; //Process all other keycodes normally
+    }
+
+    if (debug_enable) {
+        if (debug_matrix) {
+            matrix_print();
+        }
     }
 }
