@@ -112,8 +112,7 @@ void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
 }
 
 
-//SSD1306 OLED update loop, make sure to enable OLED_DRIVER_ENABLE=yes in rules.mk
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
   if (!is_keyboard_master())
@@ -131,7 +130,7 @@ const char *read_keylogs(void);
 void set_timelog(void);
 const char *read_timelog(void);
 
-void oled_task_user(void) {
+bool oled_task_user(void) {
   if (is_keyboard_master()) {
     // If you want to change the display of OLED, you need to change here
     oled_write_ln(read_layer_state(), false);
@@ -141,11 +140,12 @@ void oled_task_user(void) {
   } else {
     oled_write(read_logo(), false);
   }
+  return false;
 }
-#endif // OLED_DRIVER_ENABLE
+#endif // OLED_ENABLE
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-#ifdef OLED_DRIVER_ENABLE
+#ifdef OLED_ENABLE
   if (record->event.pressed) {
     set_keylog(keycode, record);
     set_timelog();
