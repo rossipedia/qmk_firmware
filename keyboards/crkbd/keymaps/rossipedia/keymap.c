@@ -1,13 +1,9 @@
 #include QMK_KEYBOARD_H
 #include "rossipedia.h"
 
-
-#ifdef RGBLIGHT_ENABLE
-//Following line allows macro to read current RGB settings
-extern rgblight_config_t rgblight_config;
+#ifdef SSD1306OLED
+  #include "ssd1306.h"
 #endif
-
-extern uint8_t is_master;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -34,10 +30,6 @@ enum custom_keycodes {
   BACKLIT,
   RGBRST,
   RST_HLD
-};
-
-enum macro_keycodes {
-  KC_SAMPLEMACRO,
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -116,96 +108,49 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
  */
 
-int RGB_current_mode;
 
-void persistent_default_layer_set(uint16_t default_layer) {
-  eeconfig_update_default_layer(default_layer);
-  default_layer_set(default_layer);
+#ifdef OLED_ENABLE
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+  if (!is_keyboard_master())
+    return OLED_ROTATION_180;  // flips the display 180 degrees if offhand
+  return rotation;
 }
 
-// Setting ADJUST layer RGB back to default
-void update_tri_layer_RGB(uint8_t layer1, uint8_t layer2, uint8_t layer3) {
-  if (IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2)) {
-    layer_on(layer3);
-  } else {
-    layer_off(layer3);
-  }
-}
-
-void matrix_init_user(void) {
-    #ifdef RGBLIGHT_ENABLE
-      RGB_current_mode = rgblight_config.mode;
-    #endif
-    //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
-    #ifdef SSD1306OLED
-        iota_gfx_init(!has_usb());   // turns on the display
-    #endif
-}
-
-//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
-#ifdef SSD1306OLED
-
-// When add source files to SRC in rules.mk, you can use functions.
+// When you add source files to SRC in rules.mk, you can use functions.
 const char *read_layer_state(void);
 const char *read_logo(void);
 void set_keylog(uint16_t keycode, keyrecord_t *record);
 const char *read_keylog(void);
 const char *read_keylogs(void);
 
-// const char *read_mode_icon(bool swap);
-// const char *read_host_led_state(void);
-// void set_timelog(void);
-// const char *read_timelog(void);
+void set_timelog(void);
+const char *read_timelog(void);
 
-void matrix_scan_user(void) {
-   iota_gfx_task();
-}
-
-void matrix_render_user(struct CharacterMatrix *matrix) {
-  if (is_master) {
+bool oled_task_user(void) {
+  if (is_keyboard_master()) {
     // If you want to change the display of OLED, you need to change here
-    matrix_write_ln(matrix, read_layer_state());
-    matrix_write_ln(matrix, read_keylog());
-    //matrix_write_ln(matrix, read_keylogs());
-    //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
-    //matrix_write_ln(matrix, read_host_led_state());
-    //matrix_write_ln(matrix, read_timelog());
+    oled_write_ln(read_layer_state(), false);
+    oled_write_ln(read_keylog(), false);
+    oled_write_ln(read_keylogs(), false);
+    oled_write_ln(read_timelog(), false);
   } else {
-    matrix_write(matrix, read_logo());
+    oled_write(read_logo(), false);
   }
+  return false;
 }
-
-void matrix_update(struct CharacterMatrix *dest, const struct CharacterMatrix *source) {
-  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
-    memcpy(dest->display, source->display, sizeof(dest->display));
-    dest->dirty = true;
-  }
-}
-
-void iota_gfx_task_user(void) {
-  struct CharacterMatrix matrix;
-  matrix_clear(&matrix);
-  matrix_render_user(&matrix);
-  matrix_update(&display, &matrix);
-}
-#endif//SSD1306OLED
+#endif // OLED_ENABLE
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   static uint32_t key_timer;
-
+  #ifdef OLED_ENABLE
   if (record->event.pressed) {
-#ifdef SSD1306OLED
-    set_keylog(keycode, record);
-#endif
-    // set_timelog();
+      set_keylog(keycode, record);
+      set_timelog();
   }
+  #endif
 
   switch (keycode) {
-    case QWERTY:
-      if (record->event.pressed) {
-        persistent_default_layer_set(1UL<<_QWERTY);
-      }
-      return false;
     case GAMING:
       if (record->event.pressed) {
         layer_invert(_GAMING);
@@ -214,20 +159,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     case LOWER:
       if (record->event.pressed) {
         layer_on(_LOWER);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_LOWER);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       }
+      update_tri_layer(_LOWER, _RAISE, _ADJUST);
       return false;
     case RAISE:
       if (record->event.pressed) {
         layer_on(_RAISE);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       } else {
         layer_off(_RAISE);
-        update_tri_layer_RGB(_LOWER, _RAISE, _ADJUST);
       }
+      update_tri_layer(_LOWER, _RAISE, _ADJUST);
       return false;
     case ADJUST:
         if (record->event.pressed) {
@@ -236,24 +179,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           layer_off(_ADJUST);
         }
         return false;
-    case RGB_MOD:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          rgblight_mode(RGB_current_mode);
-          rgblight_step();
-          RGB_current_mode = rgblight_config.mode;
-        }
-      #endif
-      return false;
-    case RGBRST:
-      #ifdef RGBLIGHT_ENABLE
-        if (record->event.pressed) {
-          eeconfig_update_rgblight_default();
-          rgblight_enable();
-          RGB_current_mode = rgblight_config.mode;
-        }
-      #endif
-      break;
     case RST_HLD:
       if (record->event.pressed) {
         key_timer = timer_read32();
@@ -266,3 +191,45 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
   return true;
 }
+
+/*
+// in the future, should use (1U<<_LAYER_NAME) instead, but needs to be moved to keymap,c
+#define L_BASE 0
+#define L_GAMING 2
+#define L_LOWER 4
+#define L_RAISE 8
+#define L_ADJUST 16
+#define L_ADJUST_TRI 28
+
+char layer_state_str[24];
+
+const char *read_layer_state(void) {
+    oled_write_P(PSTR("Layer: "), false);
+  switch (layer_state)
+  {
+  case L_BASE:
+    //snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Default");
+    oled_write_ln_P(PSTR("Default"), false);
+    break;
+  case L_GAMING:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Gaming");
+    break;
+  case L_RAISE:
+  case L_RAISE | L_GAMING:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Raise");
+    break;
+  case L_LOWER:
+  case L_LOWER | L_GAMING:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Lower");
+    break;
+  case L_ADJUST:
+  case L_ADJUST_TRI:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Adjust");
+    break;
+  default:
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Undef-%ld", layer_state);
+  }
+
+  return layer_state_str;
+}
+*/
