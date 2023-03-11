@@ -36,6 +36,7 @@ enum v10_keycodes {
 
 #define KC_FN_M MO(MAC_FN)
 #define KC_FN_W MO(WIN_FN)
+#define KC_GAME TG(WIN_GAME)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_BASE] = LAYOUT_ansi_89(
@@ -77,7 +78,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
         _______,  _______,  RGB_VAI,  RGB_SAI,  RGB_HUI,  _______,  _______,   _______,  KC_HOME,  KC_UP,    KC_END,   KC_PGUP,  KC_PSCR,  KC_SCRL,  KC_PAUS,            _______,
-        _______,  _______,  RGB_VAD,  RGB_SAD,  RGB_HUD,  _______,  _______,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
+        _______,  _______,  RGB_VAD,  RGB_SAD,  RGB_HUD,  _______,  KC_GAME,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
         _______,  _______,            _______,  _______,  _______,  _______,   MD_BOOT,  DB_TOGG,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PGUP,
         _______,  _______,  _______,            _______,  RGB_TOG,  _______,                       _______,            _______,                      KC_HOME,  KC_PGDN,  KC_END )
 };
@@ -94,7 +95,7 @@ const uint16_t PROGMEM encoder_map[][1][2] = {
 
 
 const uint8_t LAYER_HUE_SATS[][2] = {
-    [MAC_BASE] = {32,192},
+    [MAC_BASE] = {16,207},
     [MAC_FN]   = {0,0},
     [WIN_BASE] = {16, 255},
     [WIN_GAME] = {0, 255},
@@ -105,7 +106,7 @@ void keyboard_post_init_user(void) {
     rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
 }
 
-layer_state_t layer_state_set_user(layer_state_t state) {
+layer_state_t default_layer_state_set_user(layer_state_t state) {
     int layer = get_highest_layer(state);
 
     uprintf("layer: %i\n", layer);
@@ -124,11 +125,24 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     return state;
 }
 
+layer_state_t layer_state_set_user(layer_state_t state) {
+    int layer = get_highest_layer(state);
+    switch (layer) {
+        case MAC_BASE:
+        case WIN_BASE:
+        case WIN_GAME:
+            rgb_matrix_sethsv(
+                LAYER_HUE_SATS[layer][0],
+                LAYER_HUE_SATS[layer][1],
+                rgb_matrix_get_val()
+            );
+            break;
+    }
+    return state;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
-
-    int layer = get_highest_layer(layer_state);
-    uprintf("layer: %i\n", layer);
 
     switch (keycode) {
         case MD_BOOT:
