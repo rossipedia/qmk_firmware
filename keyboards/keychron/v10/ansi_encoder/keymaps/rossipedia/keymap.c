@@ -106,38 +106,31 @@ void keyboard_post_init_user(void) {
     rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
 }
 
-layer_state_t default_layer_state_set_user(layer_state_t state) {
-    int layer = get_highest_layer(state);
+void set_layer_backlight(layer_state_t layer) {
+    rgb_matrix_sethsv(
+        LAYER_HUE_SATS[layer][0],
+        LAYER_HUE_SATS[layer][1],
+        rgb_matrix_get_val()
+    );
+}
 
-    uprintf("layer: %i\n", layer);
-
-    switch (layer) {
-        case MAC_BASE:
-        case WIN_BASE:
-        case WIN_GAME:
-            rgb_matrix_sethsv(
-                LAYER_HUE_SATS[layer][0],
-                LAYER_HUE_SATS[layer][1],
-                rgb_matrix_get_val()
-            );
-            break;
+void set_backlight_for(layer_state_t state) {
+    if (layer_state_cmp(state, WIN_GAME)) {
+        set_layer_backlight(WIN_GAME);
+    } else if (layer_state_cmp(state, WIN_BASE)) {
+        set_layer_backlight(WIN_BASE);
+    } else if (layer_state_cmp(state, MAC_BASE)) {
+        set_layer_backlight(MAC_BASE);
     }
+}
+
+layer_state_t default_layer_state_set_user(layer_state_t state) {
+    set_backlight_for(state);
     return state;
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    int layer = get_highest_layer(state);
-    switch (layer) {
-        case MAC_BASE:
-        case WIN_BASE:
-        case WIN_GAME:
-            rgb_matrix_sethsv(
-                LAYER_HUE_SATS[layer][0],
-                LAYER_HUE_SATS[layer][1],
-                rgb_matrix_get_val()
-            );
-            break;
-    }
+    set_backlight_for(state | default_layer_state);
     return state;
 }
 
