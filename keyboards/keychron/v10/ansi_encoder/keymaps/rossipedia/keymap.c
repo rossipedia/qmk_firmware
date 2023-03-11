@@ -16,6 +16,7 @@
 
 #include QMK_KEYBOARD_H
 #include "rossipedia.h"
+#include "print.h"
 
 // clang-format off
 
@@ -30,8 +31,6 @@ enum layers{
 
 enum v10_keycodes {
     MD_BOOT = SAFE_RANGE,               //Restart into bootloader after hold timeout
-    KC_GAM,
-    KC_DBG,
 };
 
 
@@ -51,9 +50,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [MAC_FN] = LAYOUT_ansi_89(
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
-        _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  KC_HOME,  KC_UP,    KC_END,   KC_PGUP,  KC_PSCR,  KC_SCRL,  KC_PAUS,            _______,
-        _______,  _______,  _______,  _______,  KC_DBG,   _______,  _______,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
-        _______,  _______,            _______,  _______,  _______,  _______,   MD_BOOT,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PGUP,
+        _______,  _______,  RGB_VAI,  RGB_SAI,  RGB_HUI,  _______,  _______,   _______,  KC_HOME,  KC_UP,    KC_END,   KC_PGUP,  KC_PSCR,  KC_SCRL,  KC_PAUS,            _______,
+        _______,  _______,  RGB_VAD,  RGB_SAD,  RGB_HUD,  _______,  _______,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
+        _______,  _______,            _______,  _______,  _______,  _______,   MD_BOOT,  DB_TOGG,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PGUP,
         _______,  _______,  _______,            _______,  RGB_TOG,  _______,                       _______,            _______,                      KC_HOME,  KC_PGDN,  KC_END ),
 
 
@@ -77,9 +76,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [WIN_FN] = LAYOUT_ansi_89(
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
         _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  _______,  _______,  _______,  _______,  _______,  _______,  _______,            _______,
-        _______,  _______,  _______,  _______,  _______,  _______,  _______,   _______,  KC_HOME,  KC_UP,    KC_END,   KC_PGUP,  KC_PSCR,  KC_SCRL,  KC_PAUS,            _______,
-        _______,  _______,  _______,  _______,  KC_DBG,   _______,  _______,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
-        _______,  _______,            _______,  _______,  _______,  _______,   MD_BOOT,  _______,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PGUP,
+        _______,  _______,  RGB_VAI,  RGB_SAI,  RGB_HUI,  _______,  _______,   _______,  KC_HOME,  KC_UP,    KC_END,   KC_PGUP,  KC_PSCR,  KC_SCRL,  KC_PAUS,            _______,
+        _______,  _______,  RGB_VAD,  RGB_SAD,  RGB_HUD,  _______,  _______,   _______,  KC_LEFT,  KC_DOWN,  KC_RGHT,  KC_PGDN,  _______,            _______,            _______,
+        _______,  _______,            _______,  _______,  _______,  _______,   MD_BOOT,  DB_TOGG,  _______,  _______,  _______,  _______,  _______,  _______,  KC_PGUP,
         _______,  _______,  _______,            _______,  RGB_TOG,  _______,                       _______,            _______,                      KC_HOME,  KC_PGDN,  KC_END )
 };
 
@@ -95,16 +94,21 @@ const uint16_t PROGMEM encoder_map[][1][2] = {
 
 
 const uint8_t LAYER_HUE_SATS[][2] = {
-    [MAC_BASE] = {32,207},
+    [MAC_BASE] = {32,192},
     [MAC_FN]   = {0,0},
     [WIN_BASE] = {16, 255},
     [WIN_GAME] = {0, 255},
     [WIN_FN]   = {0,0}
 };
 
-layer_state_t layer_state_set_user(layer_state_t state) {
-    uint32_t layer = get_highest_layer(state);
+void keyboard_post_init_user(void) {
+    rgb_matrix_mode(RGB_MATRIX_SOLID_COLOR);
+}
 
+layer_state_t layer_state_set_user(layer_state_t state) {
+    int layer = get_highest_layer(state);
+
+    uprintf("layer: %i\n", layer);
 
     switch (layer) {
         case MAC_BASE:
@@ -123,6 +127,9 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     static uint32_t key_timer;
 
+    int layer = get_highest_layer(layer_state);
+    uprintf("layer: %i\n", layer);
+
     switch (keycode) {
         case MD_BOOT:
             if (record->event.pressed) {
@@ -135,11 +142,5 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             return false;
         default:
             return true; // Process all other keycodes normally
-    }
-
-    if (debug_enable) {
-        if (debug_matrix) {
-            matrix_print();
-        }
     }
 }
