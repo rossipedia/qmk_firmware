@@ -1,7 +1,6 @@
-
 #include QMK_KEYBOARD_H
 #include <stdio.h>
-#include "lily58.h"
+// #include "lily58.h"
 
 // in the future, should use (1U<<_LAYER_NAME) instead, but needs to be moved to keymap,c
 #define L_BASE 0
@@ -38,7 +37,7 @@ const char *read_layer_state(void) {
     snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Adjust");
     break;
   default:
-    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Undef-%ld", layer_state);
+    snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Undef-%u", layer_state);
   }
 
   return layer_state_str;
